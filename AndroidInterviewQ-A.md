@@ -139,11 +139,11 @@ The Android OS uses a priority queue to assist in managing activities running on
 
 These states can be broken into three main groups as follows:
 
-* Active or Running - Activities are considered active or running if they are in the foreground, also known as the top of the activity stack. This is considered the highest priority activity in the Android Activity stack, and as such will only be killed by the OS in extreme situations, such as if the activity tries to use more memory than is available on the device as this could cause the UI to become unresponsive.
+* **Active or Running** - Activities are considered active or running if they are in the foreground, also known as the top of the activity stack. This is considered the highest priority activity in the Android Activity stack, and as such will only be killed by the OS in extreme situations, such as if the activity tries to use more memory than is available on the device as this could cause the UI to become unresponsive.
 
 * Paused - When the device goes to sleep, or an activity is still visible but partially hidden by a new, non-full-sized or transparent activity, the activity is considered paused. Paused activities are still alive, that is, they maintain all state and member information, and remain attached to the window manager. This is considered to be the second highest priority activity in the Android Activity stack and, as such, will only be killed by the OS if killing this activity will satisfy the resource requirements needed to keep the Active/Running Activity stable and responsive.
 
-* Stopped - Activities that are completely obscured by another activity are considered stopped or in the background. Stopped activities still try to retain their state and member information for as long as possible, but stopped activities are considered to be the lowest priority of the three states and, as such, the OS will kill activities in this state first to satisfy the resource requirements of higher priority activities.
+* **Stopped** - Activities that are completely obscured by another activity are considered stopped or in the background. Stopped activities still try to retain their state and member information for as long as possible, but stopped activities are considered to be the lowest priority of the three states and, as such, the OS will kill activities in this state first to satisfy the resource requirements of higher priority activities.
 
 Sample activity to understand the life cycle
 ```java
@@ -230,7 +230,7 @@ In short, Android's own classes can be incredibly complex. The code in the frame
 ------
 
 ### What is the importance of version code and version name attributes in manifest file?
-It tells your applications version number and name. It will be used when you want to update your app in google play store.  Version no and name will be useful when you upload some application to play store and wanted to update it. When you are upgrading your application then you can increment the version number so that users of your application will get notification on their phones about the latest updates available.
+It tells your applications version number and name. It will be used when you want to update your app in google play store.  Version number and name will be useful when you upload some application to play store and wanted to update it. When you are upgrading your application then you can increment the version number so that users of your application will get notification on their phones about the latest updates available.
 
 ------
 
@@ -328,6 +328,7 @@ True, always any given application will have default one main thread.  Default a
 
 ### What is ANR (application not responding)? What is the reason for this problem and what is the solution for that problem?
 ANR - will occur if we are doing any other heavy functionality along with UI in single Main Thread.If two heavy functionalities happen in single thread, it will delay response to user actions, which may irritate user, and hence stop your process.
+
 Solution - Run only UI components in Main Thread.
 
 ------
@@ -377,11 +378,11 @@ public class MainActivity extends Activity {
 ------
 
 ### What is the difference between intent, sticky intent, pending intent?
-* intent is a message passing mechanism between components of android, except for Content Provider. You can use intent to start any component.
+* **Intent** is a message passing mechanism between components of android, except for Content Provider. You can use intent to start any component.
 
-* Sticky Intent Sticks with android, for future broadcast listeners. For example if BATTERY_LOW event occurs then that intent will be stick with android so that if any future user requested for BATTER_LOW, it will be fired; 
+* **Sticky Intent** Sticks with android, for future broadcast listeners. For example if BATTERY_LOW event occurs then that intent will be stick with android so that if any future user requested for BATTER_LOW, it will be fired; 
 
-* Pending Intent  If you want some one to perform any Intent operation at future point of time on behalf of you, then we will use Pending Intent. Eg: Booking a ticket at late night when your application is not running. In this scenario we will create a pending intent to start a service which can book tickets at late night and hand it over to Alarm Manager to fire it at that time.
+* **Pending Intent**  If you want some one to perform any Intent operation at future point of time on behalf of you, then we will use Pending Intent. Eg: Booking a ticket at late night when your application is not running. In this scenario we will create a pending intent to start a service which can book tickets at late night and hand it over to Alarm Manager to fire it at that time.
 
 ------
 
@@ -435,7 +436,7 @@ startActivity(in);
 
 ------
 
-### What is the importance of putextras in intent? How is it different from setData() ? any way both are passing data only , so in that case what is the difference?
+### What is the importance of putExtras in intent? How is it different from setData() ? any way both are passing data only , so in that case what is the difference?
 * setData() - is to pass data on which to take action. 
 * putExtra() - is to send extra information about this intent. 
 
@@ -459,7 +460,7 @@ Service is a component that performs some operation in the background with out h
 
 ------
 
-### If I want to touch ui from another thread can I touch directly? What will happen if I do so?
+### If I want to touch UI from another thread can I touch directly? What will happen if I do so?
 On the Android platform, applications operate, by default, on one thread.  This thread is called the UI thread.  It is often called that because this single thread displays the user interface and listens for events that occur when the user interacts with the app.
 
 Developers quickly learn that if code running on that thread hogs that single thread and prevents user interaction (for more than 5 seconds), it causes Android to throw up the infamous Android Not Responsive (ANR) error.
@@ -628,7 +629,7 @@ Content Provider is used to share an application's data with other applications.
 ### Can one application access other app database directly?
 Content provider is a mechanism to access apps data by out side world. even if data is stored in internal memory of app, it is possible to access it through this component.
 
-Note: Directly with out using content provider, accessing database is not possible.
+Note: Directly without using content provider, accessing database is not possible.
 
 ------
 
@@ -646,14 +647,14 @@ By default if programmer don't give any name to shared preference, then activity
 ------
 
 ### What is the difference between task, process, application, and thread?
-* Process every instance of an application being executed is called as process. You execute same application two times, it will create 2 processes.
+* **Process** every instance of an application being executed is called as process. You execute same application two times, it will create 2 processes.
 
 * Application is generalized term of a process. 
 
-* Task can have one or more applications in it. 
-eg: task of sending a message : we will start with message application, lets say i want to attach a photo to my message, then i will open gallery application also. In this case my task has got two applications, messaging and gallery application.
+* **Task** can have one or more applications in it. 
+eg: task of sending a message : we will start with message application, lets say I want to attach a photo to my message, then I will open gallery application also. In this case my task has got two applications, messaging and gallery application.
 
-* Thread  theoretically thread is a light weight process, or part of process.Practically thread is dispatch-able unit to CPU, and it is internal part of a process. With out a thread in your program it is difficult to execute your application. That's why by default every process will have at least one thread created by Operating system.
+* **Thread**  theoretically thread is a light weight process, or part of process.Practically thread is dispatch-able unit to CPU, and it is internal part of a process. Without a thread in your program it is difficult to execute your application. That's why by default every process will have at least one thread created by Operating system.
 
 ------
 
@@ -668,8 +669,11 @@ IPC means Inter process communication : Where two applications or processes will
 Since android is meant for embedded and small devices, we should not use serialization for IPC, rather we can use BINDERs which internally uses parcels. parcel is a sort of light weight serialization by using shared memory concept.
 
 There are many differences between Binder IPC and Serialization IPC:
+
 1. Serialization is very heavy to use in embedded devices, communication will be very slow.
+
 2. Binders uses Parcels to make IPC very fast.
+
 3. Binders internally uses Shared memory concept which uses less memory while sharing data between two processes.
 
 Bottom line : Binders uses less memory, and quite fast as it uses parcels. Serialization is very heavy , takes time to send and receive data, and also it takes more memory compared to binders.
@@ -697,7 +701,7 @@ The main thread (UI thread) in an Android application is set up as a looper thre
 ------
 
 ### Can I send a message from thread-a to thread-b, if thread-b didn’t prepare its looper?
-if thread-a wants to send a message to thread-b, then thread-b's looper should be prepared to retrieve message send by others.it is also possible with HandlerThread to have inter-thread communication.
+If thread-a wants to send a message to thread-b, then thread-b's looper should be prepared to retrieve message send by others.it is also possible with HandlerThread to have inter-thread communication.
 
 ------
 
@@ -761,21 +765,23 @@ Broadcast Receiver is a component that responds to system wide broadcast announc
 
 ------
 
-### What is the difference between sendbroadcast(), sendorderedbroadcast(), sendstickybroadcast() ?
-* sendbroadcast() - normal broadcast, but we can set priority as well.
+### What is the difference between sendBroadcast(), sendOrderedBroadcast(), sendStickyBroadcast() ?
+* **sendBroadcast()** - normal broadcast, but we can set priority as well.
 
-* sendorderedbroadcast() - we can set priority, and set result. can block broadcasts as well.
+* **sendOrderedBroadcast()** - we can set priority, and set result. can block broadcasts as well.
+
 In the ordered broadcast you can predict the order of broadcast receiver using priority in the intent filter.
+
     * If the priority is same for two receivers then order cannot be predicted.
 
     * In the ordered broadcast you can also pass data between two receivers.
 
     * You can also abort the broadcast anywhere in between the receivers.
 
-* sendstickybroadcast() - intent passed with this will be stick for future users who are registering through code (dynamic receivers).
+* sendStickyBroadcast() - intent passed with this will be stick for future users who are registering through code (dynamic receivers).
 When somebody sends a sticky broadcast using send stickyBroadcast(in); then that broadcast will be available for the future users who are using dynamic receivers.
-This broadcast will be available for only Dynamic Broadcast rx who are coming in future.
-Eg for stickybroadcast is - BATTERY LOW.
+This broadcast will be available for only Dynamic Broadcast who are coming in future.
+Eg for StickyBroadcast is - BATTERY LOW.
 
 ------
 
@@ -785,7 +791,7 @@ In case of crash, parent activity will get RESULT_CANCELLED.
 ------
 
 ### In case of low memory if android closes a service forcefully, then will it restart automatically or user has to start it?
-If android has stopped service with out user's knowledge, then it is the responsibility of android to restart it. But this rule will not be applicable if programmer returns START_NOT_STICKY from onStartCommand().
+If android has stopped service without user's knowledge, then it is the responsibility of android to restart it. But this rule will not be applicable if programmer returns START_NOT_STICKY from onStartCommand().
 
 ------
 
@@ -883,7 +889,7 @@ In terms of security, no difference. POST is more obscure, perhaps, but that's a
 ### If I want to secure my preference file from other activities in my app, then should I use getPreferences() or getSharedPreferences()?
 Use getPreferences(), but its not guaranteed to be protected as it will be stored with the name of Activity.
 
-* getPreferences(0) - will open or create a preference file without giving a name specifically. By default preference file name will be the current Activity name. if some one knows this, any once can access getPreference() file using that activity name. 
+* getPreferences(0) - will open or create a preference file without giving a name specifically. By default preference file name will be the current Activity name. if some one knows this, any one can access getPreference() file using that activity name. 
 
 * getSharedPreferences("name",0) - will open or create a preference file with the given name. If you want to create a preference file with a specific name then use this function. If you want multiple preference files for you activity, then also you can use this function.
 
