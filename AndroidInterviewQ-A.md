@@ -996,7 +996,7 @@ Where as Cursor is a temporary buffer area which stores results from a SQLiteDat
 
 ------
 
-### What is Bundle? What does it contain in oncreate() of your activity?
+### What is Bundle? What does it contain in onCreate() of your activity?
 Bundle contain previous savedInstantceState
 
 Bundle is a data holder, which holds data to be passed between activities.
@@ -1009,7 +1009,7 @@ This function will be called by Android before “onPause” or after “onPause
 onRestoreInstanceState():
 This function will be called after “onStart”.
 
-123.                        How to get contact number from contacts content provider?
+### How to get contact number from contacts content provider?
 Use ContactsContract.Contacts.URI and CommonDataKinds.Phone.CONTENT_URI, then request it through content resolver
 First get the all basic details from basic table of contacts
 ```java
@@ -1029,12 +1029,18 @@ String number = cur.getString(cur.getColumnIndex(                       				Comm
 ------
 
 ### What is the difference between linear layout and relative layout?
-linear layout - arranges child element in either vertical or horizontal fashion. 
-Relative layout - arranges child elements in relative to each other.
+* linear layout - arranges child element in either vertical or horizontal fashion. 
+
+* Relative layout - arranges child elements in relative to each other.
+
 Important properties of Relative Layout:
+
 * android:below
+
 * android:above
+
 * android:toRightof
+
 * android:toLeftof
 
 ------
@@ -1052,8 +1058,6 @@ Their names should help:
 ### What is adapterview? How many adapter views are available in android?
 Any view that takes input from adapter is called as adapter view. eg:listview, gallery, spinner, gridview, etc..
 
-any view that takes input from adapter is called as adapter view. eg:listview, gallery, spinner, gridview, etc..
-
 ------
 
 ### Can I give cursor to an array adapter?
@@ -1063,7 +1067,7 @@ cursor adapter takes - cursor which is returned from database tables upon queryi
 ------
 
 ### What is custom adapter, when should I use it. what are the mandatory functions I need to implement in custom adapter?
-getView, getItem, getItemId, and getCount are the mandatory functions that have to be implemented in Custom Adapter.
+`getView`, `getItem`, `getItemId`, and `getCount` are the mandatory functions that have to be implemented in Custom Adapter.
 
 ------
 
@@ -1082,39 +1086,37 @@ final machine code -- will be given to -- CPU -- to execute.
 
 ------
 
-### What is adb? What is the command to install one application using adb command prompt?  
+### What is adb? What is the command to install one application using adb command prompt?
 Android debug bridge (ADB)
   * tool used to communicate to emulator/ devices from eclipse or command prompt.
-  * its a client-server program
+  * a client-server program
 
 There are 3 components in it:
-1. a client running on development machine. -> you can invoke this by issueing    
-```
-adb shell command.
-```
-(adt/ ddms also starts adb client)
 
-2. a server [runs as a b.g process] on development machine.
-   this establishes comm'on channel between client - adb daemon running on emulator/ device.
+1. a client running on development machine. -> you can invoke this by issueing ``` adb shell command. ``` (adt/ ddms also starts adb client)
 
-3. adb-daemon that runs on emulator/ device.
-   adb -> is located in sdk/platform-tools
+2. a server [runs as a b.g process] on development machine. this establishes common channel between client - adb daemon running on emulator/ device.
+
+3. adb-daemon that runs on emulator/ device. adb -> is located in sdk/platform-tools
 
 How is this connection established?
-1. once you issue adb command, it starts adb client,
-   then searches if server process if exists or not.
 
-2. once server started, it will start listening --> on port 5037 --> for commands from [adb client]
-   It will start connections from client - to - adb daemons.
+1. once you issue adb command, it starts adb client, then searches if server process if exists or not.
+
+2. once server started, it will start listening --> on port 5037 --> for commands from [adb client] It will start connections from client - to - adb daemons.
 
 How server detects adb-daemons?
+
    a. server will check ports 5555 -to- 5585, if it finds any port then it will set up connection.
 
    Note: consoles will take up even ports, adb daemons will take up odd ports.
 
    eg: Emulator 1, console: 5554
+
        Emulator 1, adb: 5555
+
        Emulator 2, console: 5556
+
        Emulator 2, adb: 5557 ...
 
    it is multi connection (Means any client can talk to any daemon)
@@ -1194,7 +1196,11 @@ A process's priority may also be increased based on other dependencies a process
 ------
 
 ### What is the difference between viewgroup and layout?
-viewgroup is invisible container, and abstract class. Layouts are more concrete form of view groups. view groups derive from views, and layouts derive from view groups.  Eg of layouts are 1.framelayout, 2.relative layout, 3.linear layout, etc..
+viewgroup is invisible container, and abstract class. Layouts are more concrete form of view groups. view groups derive from views, and layouts derive from view groups.  Eg of layouts are 
+
+1. framelayout 
+2. relative layout 
+3. linear layout, etc..
 
 ------
 
@@ -1204,17 +1210,18 @@ Key events will flow like this: **Android system -> Activity -> Layout -> View -
 ------
 
 ### How many levels of security available in android?
-Android supports 2 levels of security for applications. one at operating system level or kernel level. other is using **permission**  tags in app level.
+Android supports 2 levels of security for applications. one at operating system level or kernel level, other is using **permission**  tags in app level.
 
 ------
 
 ### How to achive security to your service programmatically in such a way that your service should not get triggered from outside applications?
 If you don't want to expose your service to outside apps, 3 ways are there. 
-1. Don't give intent-fiiter tag, so that outsiders can't specify intent action to trigger your service. 
 
-2. User exported="false" in service tag, so that outside world can't trigger it. 
+1.  Don't give intent-fiiter tag, so that outsiders can't specify intent action to trigger your service. 
 
-3. User local service manager.
+2.  User exported="false" in service tag, so that outside world can't trigger it. 
+
+3.  User local service manager.
 
 ------
 
@@ -1238,7 +1245,7 @@ Broadcast receivers are light weight components, which has to finish off its fun
 
 ------
 
-### If I want to broadcast BATTERY_LOW action, should I use sendbroadcast() or sendstickybroadcast? Why?
+### If I want to broadcast BATTERY_LOW action, should I use sendBroadcast() or sendStickyBroadcast? Why?
 use sendStickyBroadCast(), because logically this broadcast has to be available for future users.
 We have to use sendStickyBroadCast() because, logically if battery went down, then this information has to be available for applications which may run after some time in future.
 
@@ -1280,14 +1287,17 @@ using synchronization also it is possible to manipulate UI from other threads. B
 ------
 
 ### What is the purpose of SQLiteOpenHelper?
-SQLiteOpenHelper is to make it easy to manage create or upgrade of database tables easily without loosing sensible data. table creating and upgrading has to be done carefully because if program crashes in between while creating or upgrading tables, it should not loose previous data. To reduce the burden on the programmer, these sensible data states will maintained by SQLiteOpenHelper.
+SQLiteOpenHelper is to make it easy to manage create or upgrade of database tables easily without loosing sensible data, table creating and upgrading has to be done carefully because if program crashes in between while creating or upgrading tables, it should not loose previous data. To reduce the burden on the programmer, these sensible data states will maintained by SQLiteOpenHelper.
 
 ------
 
 ### What is the procedure to upgrade database after first release?
 If you want to upgrade the database of your existing application, which is released into android play store, then follow below steps. 
+
 1. Create new version number for your latest database 
+
 2. Based on some condition pass this latest version number to SQLiteOpenHelper constructor function. 
+
 3. then what ever the updations you want to make to database, do it in onUpgrade() of SQLiteOpenHelper class.
 
 ------
@@ -1335,10 +1345,10 @@ All resources located in res folder are mostly .xml files, which will not be und
 
 ------
 
-### What does .apk  file contains?
+### What does .apk file contains?
 contains single .dex file, zipped resources, other non java library files.
 
-APK - Application Package file. It is a file format used to distribute and install android applications. .apk will contain single .dex file, zipped resources, other non java library files (c/c++). .dex file will internally contains converted .class files. other wise .apk will not contains .class files.
+APK - Application Package file. It is a file format used to distribute and install android applications. apk will contain single .dex file, zipped resources, other non java library files (c/c++). dex file will internally contains converted .class files. other wise .apk will not contains .class files.
 
 ### Difference between px, dp, dip and sp on Android?
 
@@ -1432,7 +1442,7 @@ Responses from a remote service via the Internet can often take some time, eithe
 -------
 
 ### There are four Java classes related to the use of sensors on the Android platform. List them and explain the purpose of each.
-The four Java classes related to the use of sensors on the Android platform areL
+The four Java classes related to the use of sensors on the Android platform are:
 * Sensor: Provides methods to identify which capabilities are available for a specific sensor.
 * SensorManager: Provides methods for registering sensor event listeners and calibrating sensors.
 * SensorEvent: Provides raw sensor data, including information regarding accuracy.
@@ -1505,4 +1515,5 @@ A “launch mode” is the way in which a new instance of an activity is to be a
 Service is the base class for Android services that can be extended to create any service. A class that directly extends Service runs on the main thread so it will block the UI (if there is one) and should therefore either be used only for short tasks or should make use of other threads for longer tasks.
 
 IntentService is a subclass of Service that handles asynchronous requests (expressed as “Intents”) on demand. Clients send requests through startService(Intent) calls. The service is started as needed, handles each Intent in turn using a worker thread, and stops itself when it runs out of work. Writing an IntentService can be quite simple; just extend the IntentService class and override the onHandleIntent(Intent intent) method where you can manage all incoming requests.
+
 
