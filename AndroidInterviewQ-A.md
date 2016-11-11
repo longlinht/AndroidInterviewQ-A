@@ -1516,4 +1516,73 @@ Service is the base class for Android services that can be extended to create an
 
 IntentService is a subclass of Service that handles asynchronous requests (expressed as “Intents”) on demand. Clients send requests through startService(Intent) calls. The service is started as needed, handles each Intent in turn using a worker thread, and stops itself when it runs out of work. Writing an IntentService can be quite simple; just extend the IntentService class and override the onHandleIntent(Intent intent) method where you can manage all incoming requests.
 
+-------
+
+### what is the difference between a global broadcast and local broadcast?
+Because of local broadcast keep data in the application scope, don't have to worry about privacy data leakage problems. It is more efficient as well as secured compared to global broadcasts through the system as the data won’t leave our app nor can we receive from other foreign apps. 
+
+-------
+
+### what is the difference between Activity, Window, and View?
+
+Activity like a craftsman (control unit), the Window like a Window (carrying model), the View like a paper-cut (display View), LayoutInflater like scissors, Xml configuration like window drawings.We can figure out their differences and relations through initialization of a activity instance.
+
+1. Call `attach` in Activity to create a window.
+2. The created window is `PhoneWindow`.
+3. Call `setContentView` in Activity, which actually called `getWindow().setContentView`.
+4. Create parent view: `DecorView`.
+5. Inflate R.layout.xxx
+6. Add view to parent view.
+
+-------
+
+### Describe the features of fragment
+
+* Fragment could be a part of activity to display.
+* There could be one more fragments in a activity, and same fragment could be used in different activities.
+* When activity is running, fragment also could be add, replace, and remove.
+* Fragment has its input event and life cycle, life cycle will be affected by its host activity.
+
+
+### What's the significance of Interface?
+
+* Specification
+* Extension
+* Callback
+
+-------
+
+### What's the significance of an abstract class?
+* Provide a common type of its subclasses
+* Encapsulation subclasses of duplicate content
+* To define abstract methods
+
+-------
+
+### What's the role of the inner class
+* The inner class can use multiple instances of each instance has its own state information, and information with other peripheral objects are independent of each other.
+
+* Outside of a single class, allows multiple inner class to implement the same interface in different ways, or the same class inheritance.
+
+* Create inner class object does not depend on peripheral class object creation.
+
+* Inner classes is not confusing "is - a"relationship, it is an independent entity.
+
+* Inner class provides better encapsulation, in addition to the outer class, other class cannot access
+
+-------
+
+### Does static method can be overriden？Why or why not?
+No we can't override static methods.
+Static methods can not be overridden in the exact sense of the word, but they can hide parent static methods
+
+In practice it means that compiler will decide which method to execute at compile time, and not in runtime, as it does with overridden instance methods.
+
+**Overriding**: Overriding in Java simply means that the particular method would be called based on the run time type of the object and not on the compile time type of it (which is the case with overriden static methods)
+
+**Hiding**: Parent class methods that are static are not part of a child class (although they are accessible), so there is no question of overriding it. Even if you add another static method in a subclass, identical to the one in its parent class, this subclass static method is unique and distinct from the static method in its parent class.
+s
+
+
+
 
