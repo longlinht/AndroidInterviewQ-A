@@ -320,7 +320,7 @@ HashMap 允许为 null 允许为 null AbstractMap 线程不安全
 
 * 当`android:orientation="horizontal`时，说明你希望将水平方向的布局交给**LinearLayout** ，其子元素的`android:layout_gravity="right|left"` 等控制水平方向的gravity值都是被忽略的，此时**LinearLayout**中的子元素都是默认的按照水平从左向右来排，我们可以用`android:layout_gravity="top|bottom"`等gravity值来控制垂直展示。
 
-* 反之，可以知道当`android:orientation="vertical`时，**LinearLayout**对其子元素展示上的的处理方式。
+* 反之，可以知道当`android:orientation="vertical""`时，**LinearLayout**对其子元素展示上的的处理方式。
 
 #### AbsoluteLayout(绝对布局)
 
@@ -370,6 +370,34 @@ onRestart()—>onStart()—>onResume()，再次回到运行状态。
 
 * 解锁：onStart()->onResume()
 
+### Application，Task和Process的区别与联系
+
+#### Application 
+
+* 在android中，总体来说一个应用就是一组组件的集合
+
+* 当我们写完了多个组件，并且在manifest文件中注册了这些组件之后，把这些组件和组件使用到的资源打包成apk，我们就可以说完成了一个application。application和组件的关系可以在manifest文件中清晰地体现出来
+
+#### Task
+
+* task是在程序运行时，只针对activity的概念, 
+
+* task是一组相互关联的activity的集合
+
+* task存在于一个称为back stack的数据结构中，也就是说，framework是以栈的形式管理用户开启的activity
+
+* task是可以跨应用的，这正是task存在的一个重要原因。有的Activity，虽然不在同一个app中，但为了保持用户操作的连贯性，把他们放在同一个任务中
+
+#### Process
+
+* 进程是操作系统内核中的一个概念，表示直接受内核调度的执行单位。
+
+* 在默认情况下，一个应用程序的所有组件运行在同一个进程中
+
+* 应用程序中的不同组件可以运行在不同的进程中。只需要在manifest中用process属性指定组件所运行的进程的名字
+
+
+**任务（Task）不仅可以跨应用（Application），还可以跨进程（Process）**
 
 ### 通过Acitivty的xml标签来改变任务栈的默认行为
 
@@ -383,23 +411,55 @@ onRestart()—>onStart()—>onResume()，再次回到运行状态。
 
 * standard : 
 
-标准模式,每次启动Activity都会创建一个新的Activity实例,并且将其压入任务栈栈顶,而不管这个Activity是否已经存在。Activity的启动三回调(onCreate()->onStart()->onResume())都会执行。
+标准模式,每次启动Activity都会创建一个新的Activity实例,并且将其压入任务栈栈顶,而不管这个Activity是否已经存在。Activity的启动三回调(onCreate()->onStart()->onResume())都会执行。这种Activity将被创建并置于栈顶，和发送intent的Activity处于同一个任务中。
 
+注：**一般来讲，安卓第三个虚拟键所列出的那些就是任务**。
+
+>撰写邮件的Activity或者发布社交网络状态的Activity都是采用这种Activity的例子
 
 * singleTop : 
 
 **栈顶复用模式**.这种模式下,如果新Activity已经位于任务栈的栈顶,那么此Activity不会被重新创建,所以它的启动三回调就不会执行,同时Activity的onNewIntent()方法会被回调.如果Activity已经存在但是不在栈顶,那么作用与standard模式一样.
 
+> 这种启动模式的用例之一就是搜索功能。假设我们创建了一个搜索框，点击搜索的时候将导航到一个显示搜索结果列表的SearchActivity中，为了更好的用户体验，这个搜索框一般也会被放到SearchActivity中，这样用户想要再次搜索就不需要按返回键。
+
+>不管怎样，singleTop和它的调用者处在一个任务中。如果你想要让intent发送给另一个任务中处于栈顶的Activity，是不行的。
+
+>而当Intent来自于另外一个应用的时候，新的Activity的启动方式和standard模式是一致的（pre-Lollipop: 处于调用者任务的栈顶，Lollipop: 会创建一个新的任务）
+
 * singleTask: 
 
-**栈内复用模式**.创建这样的Activity的时候,系统会先确认它所需任务栈已经创建,否则先创建任务栈.然后放入Activity,如果栈中已经有一个Activity实例,那么这个Activity就会被调到栈顶,onNewIntent(),并且singleTask会清理在当前Activity上面的所有Activity.(clear top)
+**栈内复用模式**.创建这样的Activity的时候,系统会先确认它所需任务栈已经创建,否则先创建任务栈.然后放入Activity,如果栈中已经有一个Activity实例,那么这个Activity就会被调到栈顶,回调onNewIntent(),并且singleTask会清理在当前Activity上面的所有Activity.(clear top)
+
+**其实，把启动模式设置为singleTask，framework在启动该activity时只会把它标示为可在一个新任务中启动，至于是否在一个新任务中启动，还要受其他条件的限制**
+
+**对应用首页添加此模式，当在应用已经操作进入很深时，一个返回首页的操作，需要你记录压栈记录等操作，但是当添加此模式后，直接跳转即可，系统自动清空栈堆。**
+
+>邮件客户端的收件箱或者社交网络的时间轴。这些Activity一般不会设计成拥有多个实例，singleTask可以满足
 
 * singleInstance : 
 
 **加强版的singleTask模式**,这种模式的Activity只能单独位于一个任务栈内,由于栈内复用的特性,后续请求均不会创建新的Activity,除非这个独特的任务栈被系统销毁了
 
+>这种模式很少被使用。实际使用的案例如Launcher的Activity或者100%确定只有一个Activity的应用。总之除非完全有必要，不然我不建议使用这种模式。
 
 **Activity的堆栈管理以ActivityRecord为单位,所有的ActivityRecord都放在一个List里面.可以认为一个ActivityRecord就是一个Activity栈**
+
+>Android Framework既能在同一个任务中对Activity进行调度，也能以Task为单位进行整体调度。在启动模式为standard或singleTop时，一般是在同一个任务中对Activity进行调度，而在启动模式为singleTask或singleInstance是，一般会对Task进行整体调度。
+
+### TaskAffinity
+
+* taskAffinity表示当前activity具有亲和力的一个任务（翻译不是很准确，原句为The task that the activity has an affinity for.），大致可以这样理解，这个 taskAffinity表示一个任务，这个任务就是当前activity所在的任务。
+
+* 在概念上，具有相同的affinity的activity（即设置了相同taskAffinity属性的activity）属于同一个任务。
+
+* 一个任务的affinity决定于这个任务的根activity（root activity）的taskAffinity。
+
+* 这个属性决定两件事：当activity被re-parent时，它可以被re-paren哪个任务中；当activity以FLAG_ACTIVITY_NEW_TASK标志启动时，它会被启动到哪个任务中。（这个比较    难以理解，请结合<activity>中的属性allowTaskReparenting和Intent中的标志       FLAG_ACTIVITY_NEW_TASK加以理解）
+* 默认情况下，一个应用中的所有activity具有相同的taskAffinity，即应用程序的包名。我们可以通过设置不同的taskAffinity属性给应用中的activity分组，也可以把不同的       应用中的activity的taskAffinity设置成相同的值。 
+
+* 为一个activity的taskAffinity设置一个空字符串，表明这个activity不属于任何task。
+
 
 ### Activity缓存方法
 
@@ -426,12 +486,12 @@ onSaveInstanceState方法会在什么时候被执行，有这么几种情况：
 
 另外，需要注意的几点：
 
-* 布局中的每一个View默认实现了onSaveInstanceState()方法，这样的话，这个UI的任何改变都会自动地存储和在activity重新创建的时候自动地恢复。但是这种情况只有在你为这个UI提供了唯一的ID之后才起作用，如果没有提供ID，app将不会存储它的状态。
+* **布局中的每一个View默认实现了onSaveInstanceState()方法**，这样的话，这个UI的任何改变都会自动地存储和在activity重新创建的时候自动地恢复。但是这种情况只有在**你为这个UI提供了唯一的ID之后才起作用**，如果没有提供ID，app将不会存储它的状态。
 
 * 由于默认的onSaveInstanceState()方法的实现帮助UI存储它的状态，所以如果你需要覆盖这个方法去存储额外的状态信息，你应该在执行任何代码之前都调用父类的onSaveInstanceState()方法（super.onSaveInstanceState()）。
 既然有现成的可用，那么我们到底还要不要自己实现onSaveInstanceState()?这得看情况了，如果你自己的派生类中有变量影响到UI，或你程序的行为，当然就要把这个变量也保存了，那么就需要自己实现，否则就不需要。
 
-* 由于onSaveInstanceState()方法调用的不确定性，你应该只使用这个方法去记录activity的瞬间状态（UI的状态）。不应该用这个方法去存储持久化数据。当用户离开这个activity的时候应该在onPause()方法中存储持久化数据（例如应该被存储到数据库中的数据）
+* 由于onSaveInstanceState()方法调用的不确定性，你**应该只使用这个方法去记录activity的瞬间状态（UI的状态）**。不应该用这个方法去存储持久化数据。当用户离开这个activity的时候应该在onPause()方法中存储持久化数据（例如应该被存储到数据库中的数据）
 
 * onSaveInstanceState()如果被调用，这个方法会在onStop()前被触发，但系统并不保证是否在onPause()之前或者之后触发。
 
@@ -445,14 +505,19 @@ onSaveInstanceState方法会在什么时候被执行，有这么几种情况：
 
 * 另外，onRestoreInstanceState的bundle参数也会传递到onCreate方法中，你也可以选择在onCreate方法中做数据还原。
 
-* onRestoreInstanceState在onstart之后执行
+* onRestoreInstanceState在onStart之后执行
 
 ### View的生命周期
 
 #### Creation（创建）
 
-* Constructors（构造函数）：有一种形式的构造函数会在View在代码中被创建时调用，另一种形式的构造函数会在View从layout加载出来时被调用。
-第二种形式的构造函数会解析和应用layout文件中定义的任何属性。
+* Constructors（构造函数）：
+
+    * 有一种形式的构造函数会在View在代码中被创建时调用，
+
+    * 另一种形式的构造函数会在View从layout加载出来时被调用。
+
+    * 第二种形式的构造函数会解析和应用layout文件中定义的任何属性。
 
 * onFinishInflate()：该方法当View及其子View从XML文件中加载完成后会被调用。
 
@@ -504,7 +569,7 @@ onSaveInstanceState方法会在什么时候被执行，有这么几种情况：
 
 * 而且在一个Activity中创建的子线程，另一个Activity无法对其进行操作。但是Service就不同了，所有的Activity都可以与Service进行关联，然后可以很方便地操作其中的方法，即使Activity被销毁了，之后只要重新与Service建立关联，就又能够获取到原有的Service中Binder的实例。因此，使用Service来处理后台任务，Activity就可以放心地finish，完全不需要担心无法对后台任务进行控制的情况。
 
-### Intent的使用方法，可以传递哪些数据类型
+### Intent可以传递哪些数据类型
 
 * Intent/Bundle支持传递基本类型的数据和基本类型的数组数据，以及String/CharSequence类型的数据和String/CharSequence类型的数组数据。
 
@@ -516,11 +581,12 @@ onSaveInstanceState方法会在什么时候被执行，有这么几种情况：
 
 * 通过public ComponentName startService(Intent service)方法去启动一个Service，此时Service的生命周期与启动它的Context无关。
 
-* 要注意的是，whatever，都需要在xml里注册你的Service，就像这样:
+* 要注意的是，都需要在xml里注册你的Service，就像这样:
+
 `
 <service android:name=".packnameName.youServiceName"
         android:enabled="true" />
-    `
+`
 
 ### 广播(Broadcast Receiver)的两种动态注册和静态注册有什么区别。
 
@@ -530,7 +596,7 @@ onSaveInstanceState方法会在什么时候被执行，有这么几种情况：
 
 ### 目前能否保证service不被杀死
 
-* Service设置成START_STICKY
+* onStartCommand方法，返回START_STICKY
 
 kill 后会被重启（等待5秒左右），重传Intent，保持与重启前一样
 
@@ -547,13 +613,17 @@ Android中的进程是托管的，当系统进程空间紧张的时候，会依�
 * onDestroy方法里重启service
 
 service +broadcast  方式，就是当service走onDestory()的时候，发送一个自定义的广播，当收到广播的时候，重新启动service
-也可以直接在onDestroy()里startService
+也可以直接在onDestroy()里startService,
 **当使用类似QQ管家等第三方应用或是在setting里-应用-强制停止时，APP进程可能就直接被干掉了，onDestroy方法都进不来，所以还是无法保证**
 
 * 监听系统广播判断Service状态
 
 通过系统的一些广播，比如：手机重启、界面唤醒、应用状态改变等等监听并捕获到，然后判断我们的Service是否还存活，别忘记加权限
 **这也能算是一种措施，不过感觉监听多了会导致Service很混乱，带来诸多不便**
+
+* Application加上Persistent属性
+
+据说这个属性不能乱设置，不过设置后，的确发现优先级提高不少，或许是相当于系统级的进程，但是还是无法保证存活
 
 * 在JNI层,用C代码fork一个进程出来
 
@@ -565,13 +635,26 @@ service +broadcast  方式，就是当service走onDestory()的时候，发送一
 
 ### 动画有哪两类，各有什么特点？三种动画的区别
 
-* tween 补间动画。通过指定View的初末状态和变化时间、方式，对View的内容完成一系列的图形变换来实现动画效果。
-Alpha
-Scale
-Translate
-Rotate。
+总的来说，Android动画可以分为两类，最初的传统动画和Android3.0 之后出现的属性动画；
+传统动画又包括 帧动画（Frame Animation）和补间动画（Tweened Animation）。
 
-* frame 帧动画
+* Tween 补间动画。通过指定View的初末状态和变化时间、方式，对View的内容完成一系列的图形变换来实现动画效果,共有四种形式:
+
+Alpha
+
+Scale
+
+Translate
+
+Rotate
+
+>setFillAfter决定了动画在播放结束时是否保持最终的状态
+
+>setRepeatCount决定了动画的重复次数
+
+>setRepeatMode 决定了动画的重复方式
+
+* Frame 帧动画
 AnimationDrawable 控制
 animation-list xml布局
 
@@ -584,7 +667,7 @@ Android为此数据库提供了一个名为SQLiteDatabase的类，封装了一�
 
 * SharedPreference： 除SQLite数据库外，另一种常用的数据存储方式，其本质就是一个xml文件，常用于存储较简单的参数设置。
 
-* File： 即常说的文件（I/O）存储方法，常用语存储大数量的数据，但是缺点是更新数据将是一件困难的事情。
+* File： 即常说的文件（I/O）存储方法，常用于存储大数量的数据，但是缺点是更新数据将是一件困难的事情。
 
 * ContentProvider: Android系统中能实现所有应用程序共享的一种数据存储方式，由于数据通常在各应用间的是互相私密的，所以此存储方式较少使用，但是其又是必不可少的一种存储方式。例如音频，视频，图片和通讯录，一般都可以采用此种方式进行存储。每个Content Provider都会对外提供一个公共的URI（包装成Uri对象），如果应用程序有数据需要共享时，就需要使用Content Provider为这些数据定义一个URI，然后其他的应用程序就通过Content Provider传入这个URI来对数据进行操作。
 
@@ -606,15 +689,27 @@ Android为此数据库提供了一个名为SQLiteDatabase的类，封装了一�
 
 * 同时 res目录下的文件可以通过R 文件访问。Asset 也是用来存储资源，但是 asset 文件内容只能通过路径或者 AssetManager 读取。 
 
+### Android加速启动App
+
+作为普通应用，App进程的创建等环节我们是无法主动控制的，可以优化的也就是Application、Activity创建以及回调等过程。
+同样，Google也给出了启动加速的方向：
+
+* 利用提前展示出来的Window，快速展示出来一个界面，给用户快速反馈的体验；
+
+* 避免在启动时做密集沉重的初始化（Heavy app initialization）；
+
+* 定位问题：避免I/O操作、反序列化、网络操作、布局嵌套等。
+
 ### Android怎么加速启动Activity
 
 分两种情况
 
 * 启动应用 ：Application 的构造方法，onCreate 方法中不要进行耗时操作，数据预读取(例如 init 数据) 放在异步中操作
 
-* 启动普通的Activity：A 启动B 时不要在 A 的 onPause 中执行耗时操作。因为 B 的 onResume 方法必须等待 A 的 onPause 执行完成后才能运行
+* 启动普通的Activity：A启动B时不要在A的 onPause 中执行耗时操作。因为B的 onResume 方法必须等待A的 onPause 执行完成后才能运行
 
 ### Android内存优化方法：
+
 ListView优化，及时关闭资源，图片缓存等等。
 
 ### Android中弱引用与软引用的应用场景。
@@ -646,8 +741,6 @@ ListView优化，及时关闭资源，图片缓存等等。
 * onInterceptTouchEvent(ViewGroup)
 
 
-
-
 ### 下拉刷新实现原理
 
 ### Context区别
@@ -660,7 +753,7 @@ ListView优化，及时关闭资源，图片缓存等等。
 
 * Activity在创建的时候会new一个ContextImpl对象并在attach方法中关联它，Application和Service也差不多。ContextWrapper的方法内部都是转调ContextImpl的方法
 
-* 创建对话框传入Application的Context是不可以的
+* **创建对话框传入Application的Context是不可以的**
 
 * 尽管Application、Activity、Service都有自己的ContextImpl，并且每个ContextImpl都有自己的mResources成员，但是由于它们的mResources成员都来自于唯一的ResourcesManager实例，所以它们看似不同的mResources其实都指向的是同一块内存
 
@@ -680,18 +773,14 @@ onStartCommand中回调了onStart，onStart中通过mServiceHandler发送消息�
 ### 图片缓存
 
 查看每个应用程序最高可用内存：
+`
     int maxMemory = (int) (Runtime.getRuntime().maxMemory() / 1024);  
-    Log.d("TAG", "Max memory is " + maxMemory + "KB");  
-
+`
 
 ### Gradle
 
 构建工具、Groovy语法、Java
 Jar包里面只有代码，aar里面不光有代码还包括代码还包括资源文件，比如 drawable 文件，xml 资源文件。对于一些不常变动的 Android Library，我们可以直接引用 aar，加快编译速度
-
-### Android 内存泄漏总结
-
-内存管理的目的就是让我们在开发中怎么有效的避免我们的应用出现内存泄漏的问题。内存泄漏大家都不陌生了，简单粗俗的讲，就是该被释放的对象没有释放，一直被某个或某些实例所持有却不再被使用导致 GC 不能回收。
 
 ### Java 内存分配策略
 
@@ -714,11 +803,11 @@ Java 程序运行时的内存分配策略有三种,分别是静态分配,栈式�
 **局部变量的基本数据类型和引用存储于栈中，引用的对象实体存储于堆中。—— 因为它们属于方法中的变量，生命周期随方法而结束。
 成员变量全部存储与堆中（包括基本数据类型，引用和引用的对象实体）—— 因为它们属于类，类对象终究是要被new出来使用的。**
 
-### Java是如何管理内存
+### Java如何管理内存
 
-为了更好理解 GC 的工作原理，我们可以将对象考虑为有向图的顶点，将引用关系考虑为图的有向边，有向边从引用者指向被引对象。另外，每个线程对象可以作为一个图的起始顶点，例如大多程序从 main 进程开始执行，那么该图就是以 main 进程顶点开始的一棵根树。在这个有向图中，根顶点可达的对象都是有效对象，GC将不回收这些对象。如果某个对象 (连通子图)与这个根顶点不可达(注意，该图为有向图)，那么我们认为这个(这些)对象不再被引用，可以被 GC 回收。
+为了更好理解 GC 的工作原理，我们可以**将对象考虑为有向图的顶点，将引用关系考虑为图的有向边，有向边从引用者指向被引用对象**。另外，每个线程对象可以作为一个图的起始顶点，例如大多程序从 main 进程开始执行，那么该图就是以 main 进程顶点开始的一棵根树。在这个有向图中，根顶点可达的对象都是有效对象，GC将不回收这些对象。如果某个对象 (连通子图)与这个根顶点不可达(注意，该图为有向图)，那么我们认为这个(这些)对象不再被引用，可以被 GC 回收。
 
-Java使用有向图的方式进行内存管理，**可以消除引用循环的问题**，例如有三个对象，相互引用，只要它们和根进程不可达的，那么GC也是可以回收它们的。这种方式的优点是管理内存的精度很高，但是效率较低。**另外一种常用的内存管理技术是使用计数器**，例如COM模型采用计数器方式管理构件，它与有向图相比，精度行低(很难处理循环引用的问题)，但执行效率很高。
+Java使用有向图的方式进行内存管理，**可以消除引用循环的问题**，例如有三个对象，相互引用，只要它们和根进程不可达的，那么GC也是可以回收它们的。这种方式的优点是管理内存的精度很高，但是效率较低。**另外一种常用的内存管理技术是使用计数器**，例如COM模型采用计数器方式管理构件，它与有向图相比，精度很低(很难处理循环引用的问题)，但执行效率很高。
 
 ### 什么是Java中的内存泄露
 
@@ -740,9 +829,8 @@ Java使用有向图的方式进行内存管理，**可以消除引用循环的�
 
 ### Java中的内存泄漏
 
-* Java内存泄漏引起的原因
-
 * 静态集合类引起内存泄漏：
+
 像HashMap、Vector等的使用最容易出现内存泄露，这些静态变量的生命周期和应用程序一致，他们所引用的所有的对象Object也不能被释放，因为他们也将一直被Vector等引用着。
 
 ```
@@ -785,28 +873,32 @@ public static void main(String[] args)
 ```
 
 * 监听器
+
 在java 编程中，我们都需要和监听器打交道，通常一个应用当中会用到很多监听器，我们会调用一个控件的诸如addXXXListener()等方法来增加监听器，但往往在释放对象的时候却没有记住去删除这些监听器，从而增加了内存泄漏的机会。
 
 * 各种连接
+
 比如数据库连接（dataSourse.getConnection()），网络连接(socket)和io连接，除非其显式的调用了其close（）方法将其连接关闭，否则是不会自动被GC 回收的。对于Resultset 和Statement 对象可以不进行显式回收，但Connection 一定要显式回收，因为Connection 在任何时候都无法自动回收，而Connection一旦回收，Resultset 和Statement 对象就会立即为NULL。但是如果使用连接池，情况就不一样了，除了要显式地关闭连接，还必须显式地关闭Resultset Statement 对象（关闭其中一个，另外一个也会关闭），否则就会造成大量的Statement 对象无法释放，从而引起内存泄漏。这种情况下一般都会在try里面去的连接，在finally里面释放连接。
 
 * 内部类和外部模块的引用
+
 内部类的引用是比较容易遗忘的一种，而且一旦没释放可能导致一系列的后继类对象没有释放。此外程序员还要小心外部模块不经意的引用，例如程序员A 负责A 模块，调用了B 模块的一个方法如：
 public void registerMsg(Object b);
 这种调用就要非常小心了，传入了一个对象，很可能模块B就保持了对该对象的引用，这时候就需要注意模块B 是否提供相应的操作去除引用。
 
 * 单例模式
+
 不正确使用单例模式是引起内存泄漏的一个常见问题，单例对象在初始化后将在JVM的整个生命周期中存在（以静态变量的方式），如果单例对象持有外部的引用，那么这个对象将不能被JVM正常回收，导致内存泄漏，考虑下面的例子：
 
 ```
-class A{
-    public A(){
+class A {
+    public A() {
         B.getInstance().setA(this);
     }
 ....
 }
 //B类采用单例模式
-class B{
+class B {
     private A a;
     private static B instance=new B();
     public B(){}
@@ -1098,7 +1190,7 @@ public void dispatchMessage(Message msg) {
 * 总之，只在初次访问新内容时，才通过网络获取图片资源
 
 
-### 不容作用域的变量类型
+### 不不同作用域的变量类型
 
 * 函数成员变量 - 尽在函数内部有效
 
